@@ -22,7 +22,7 @@ parser.add_argument('--batch_size', type=int, default=1000,
 parser.add_argument('--incompressible_flow', type=int, default=1,
                     help='Use an incompressible flow (GIN) (1, default) or compressible flow (GLOW) (0)')
 parser.add_argument('--empirical_vars', type=int, default=1,
-                    help='Estimate emperical variables (means and stds) for each batch (1, default) or learn them along \
+                    help='Estimate empirical variables (means and stds) for each batch (1, default) or learn them along \
                             with model weights (0)')
 parser.add_argument('--init_identity', type=int, default=1,
                     help='Initialize the network as the identity (1, default) or not (0)')

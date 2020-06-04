@@ -67,13 +67,13 @@ def scale_ground_truth(y, x):
 
 
 
-def emnist_plot_samples(model, n_rows, mu=None, sig=None, dims_to_sample=torch.arange(784), temp=1, 
-                        save_dir='./figures/emnist/samples/'):
+def emnist_plot_samples(model, n_rows, t, mu=None, sig=None, dims_to_sample=torch.arange(784), temp=1, 
+                        save_dir='./figures/emnist/'):
     """
     Plots sampled digits. Each row contains all 10 digits with a consistent style
     """
-    t = int(time())     # time stamp which will be used as save name
-    os.makedirs(os.path.join(save_dir, str(t)))
+    save_dir_full = os.path.join(save_dir, str(t), 'samples')
+    os.makedirs(save_dir_full)
     model.eval()
     fig = plt.figure(figsize=(10, n_rows))
     n_dims_to_sample = len(dims_to_sample)
@@ -101,7 +101,7 @@ def emnist_plot_samples(model, n_rows, mu=None, sig=None, dims_to_sample=torch.a
     plt.imshow(im, cmap='gray', vmin=0, vmax=1)
     plt.xticks([])
     plt.yticks([])
-    plt.savefig(save_dir+f'{t}/emnist_samples.png', bbox_inches='tight', pad_inches=0.5)
+    plt.savefig(os.path.join(save_dir_full, 'emnist_samples.png'), bbox_inches='tight', pad_inches=0.5)
     plt.close()
 
 

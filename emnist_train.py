@@ -22,7 +22,7 @@ parser.add_argument('--data_root_dir', type=str, default='./',
 parser.add_argument('--incompressible_flow', type=int, default=1,
                     help='Use an incompressible flow (GIN) (1, default) or compressible flow (GLOW) (0)')
 parser.add_argument('--empirical_vars', type=int, default=1,
-                    help='Estimate emperical variables (means and stds) for each batch (1, default) or learn them along \
+                    help='Estimate empirical variables (means and stds) for each batch (1, default) or learn them along \
                             with model weights (0)')
 parser.add_argument('--config_file', type=str, default=None,
                     help='Rerun an experiment using the saved config file')
