@@ -4,7 +4,7 @@ import numpy as np
 from time import time
 from model import GIN
 from data import make_dataloader_emnist, get_mu_sig_emnist
-from plot import emnist_plot_samples
+from plot import emnist_plot_samples, emnist_plot_variation_along_dims, emnist_plot_spectrum
 
 parser = argparse.ArgumentParser(description='Experiments on EMNIST with GIN (plotting script)')
 parser.add_argument('--checkpoint_path', type=str, default=None,
@@ -22,6 +22,7 @@ assert args.empirical_vars in [0,1], 'Argument should be 0 or 1'
 
 model = GIN(dataset='EMNIST', incompressible_flow=args.incompressible_flow, 
             empirical_vars=args.empirical_vars)
+
 if args.checkpoint_path is not None:
     fname = args.checkpoint_path
 else:
@@ -32,8 +33,27 @@ else:
     last_pt = f'{np.max(pt_array):03d}.pt'
     fname = os.path.join(save_dir, last_t, last_pt)
     assert os.path.isfile(fname), f'No file called {fname} exists'
+
 model.load(fname)
 dataloader = make_dataloader_emnist(batch_size=1000, train=False, root_dir=args.data_root_dir)
-mu, sig = get_mu_sig_emnist(model, dataloader)
+
+if args.empirical_vars:
+    mu, sig = get_mu_sig_emnist(model, dataloader)
+    sig_rms = np.sqrt(np.mean((sig**2).detach().cpu().numpy(), axis=0))
+else:
+    mu, sig = None, None
+    sig_rms = np.sqrt(np.mean((model.log_sig.exp()**2).detach().cpu().numpy(), axis=0))
+
 t = int(time())             # time stamp which will be used as save name
+
+print('Plotting samples from model')
 emnist_plot_samples(model, 12, t, mu=mu, sig=sig)
+
+print('Plotting spectrum')
+emnist_plot_spectrum(sig_rms, t)
+
+n_dims_to_plot = 40
+print(f'Plotting effect of {n_dims_to_plot} latent space dimensions with highest variance')
+top_sig_dims = np.flip(np.argsort(sig_rms))
+dims_to_plot = top_sig_dims[:n_dims_to_plot]
+emnist_plot_variation_along_dims(model, dims_to_plot, t, mu=mu, sig=sig)
