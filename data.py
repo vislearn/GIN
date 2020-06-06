@@ -11,9 +11,6 @@ def generate_artificial_data_10d(n_clusters, n_data_points):
     latent_means = torch.rand(n_clusters, 2)*10 - 5         # in range (-5, 5)
     latent_stds  = torch.rand(n_clusters, 2)*2.5 + 0.5      # in range (0.5, 3)
     
-    latent_means /= 2
-    latent_stds  /= 2
-    
     labels = torch.randint(n_clusters, size=(n_data_points,))
     latent = latent_means[labels] + torch.randn(n_data_points, 2)*latent_stds[labels]
     latent = torch.cat([latent, torch.randn(n_data_points, 8)*1e-2], 1)

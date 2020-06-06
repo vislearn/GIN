@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 import FrEIA.framework as Ff
 import FrEIA.modules as Fm
-from gin_coupling_block import GINCouplingBlock
 
 class GIN(nn.Module):
     def __init__(self, dataset, incompressible_flow=True, n_classes=None, empirical_vars=True, init_identity=True):
@@ -126,7 +125,7 @@ def subnet_fc_10d(c_in, c_out, init_identity):
 
 def construct_net_10d(coupling_block, init_identity=True):
     if coupling_block == 'gin':
-        block = GINCouplingBlock
+        block = Fm.GINCouplingBlock
     else:
         assert coupling_block == 'glow'
         block = Fm.GLOWCouplingBlock
@@ -183,7 +182,7 @@ def subnet_conv2(c_in, c_out):
 
 def construct_net_emnist(coupling_block):
     if coupling_block == 'gin':
-        block = GINCouplingBlock
+        block = Fm.GINCouplingBlock
     else:
         assert coupling_block == 'glow'
         block = Fm.GLOWCouplingBlock
