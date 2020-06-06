@@ -5,22 +5,6 @@ from torchvision.transforms import Compose, ToTensor, Lambda
 import numpy as np
 import os
 
-from model import construct_net_10d
-
-def generate_artificial_data_10d(n_clusters, n_data_points):
-    latent_means = torch.rand(n_clusters, 2)*10 - 5         # in range (-5, 5)
-    latent_stds  = torch.rand(n_clusters, 2)*2.5 + 0.5      # in range (0.5, 3)
-    
-    labels = torch.randint(n_clusters, size=(n_data_points,))
-    latent = latent_means[labels] + torch.randn(n_data_points, 2)*latent_stds[labels]
-    latent = torch.cat([latent, torch.randn(n_data_points, 8)*1e-2], 1)
-    
-    random_transf = construct_net_10d('glow', init_identity=False)
-    data = random_transf(latent).detach()
-    
-    return latent, data, labels
-
-
 def make_dataloader(data, target, batch_size):
     dataset = BasicDataset(data, target)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
@@ -62,16 +46,6 @@ def make_dataloader_emnist(batch_size, train=True, root_dir='./'):
                     quit()
     dataloader = torch.utils.data.DataLoader(emnist, batch_size=batch_size, shuffle=True)
     return dataloader
-
-
-def get_mu_sig_emnist(model, dataloader):
-    examples = iter(dataloader)
-    data, target = next(examples)
-    model.eval()
-    latent = model(data.to(model.device)).detach().cpu()
-    mu = torch.stack([latent[target == i].mean(0) for i in range(10)])
-    sig = torch.stack([latent[target == i].std(0) for i in range(10)])
-    return mu, sig 
     
     
 

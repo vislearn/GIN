@@ -5,13 +5,11 @@ import matplotlib.pyplot as plt
 from time import time
 import os
 
-def artificial_data_reconstruction_plot(model, latent, data, target, save_dir='./figures/artificial_data/'):
+def artificial_data_reconstruction_plot(model, latent, data, target):
     """
     This function plots 8 figures of a reconstructed latent space, each for a different orientation of the 
     reconstructed latent space.
     """
-    t = int(time())     # time stamp which will be used as save folder name
-    os.makedirs(os.path.join(save_dir, str(t)))
     model.eval()
     model.cpu()
     z_reconstructed = model(data).detach()
@@ -55,7 +53,7 @@ def artificial_data_reconstruction_plot(model, latent, data, target, save_dir='.
                 
                 plt.tight_layout()
                 fig_idx = 4*dim_order + 2*max(dim1_factor, 0) + max(dim2_factor, 0)
-                plt.savefig(save_dir+f'{t}/reconstruction_{fig_idx:d}.png')
+                plt.savefig(os.path.join(model.save_dir, 'figures', f'reconstruction_{fig_idx:d}.png'))
                 plt.close()
     
 
@@ -67,33 +65,20 @@ def scale_ground_truth(y, x):
 
 
 
-def emnist_plot_samples(model, n_rows, t, mu=None, sig=None, dims_to_sample=torch.arange(784), temp=1, 
-                        save_dir='./figures/emnist/'):
+def emnist_plot_samples(model, n_rows, dims_to_sample=torch.arange(784), temp=1):
     """
     Plots sampled digits. Each row contains all 10 digits with a consistent style
     """
-    save_dir_full = os.path.join(save_dir, str(t))
-    os.makedirs(save_dir_full, exist_ok=True)
     model.eval()
     fig = plt.figure(figsize=(10, n_rows))
     n_dims_to_sample = len(dims_to_sample)
     style_sample = torch.zeros(n_rows, 784)
     style_sample[:,dims_to_sample] = torch.randn(n_rows, n_dims_to_sample)*temp
     style_sample = style_sample.to(model.device)
-    if model.empirical_vars:
-        assert mu is not None
-        assert sig is not None
-        # style sample: (n_rows, n_dims)
-        # mu,sig: (n_classes, n_dims)
-        # latent: (n_rows, n_classes, n_dims)
-        latent = style_sample.unsqueeze(1)*sig.unsqueeze(0) + mu.unsqueeze(0)
-    else:
-        assert mu is None
-        assert sig is None
-        # style sample: (n_rows, n_dims)
-        # mu,sig: (n_classes, n_dims)
-        # latent: (n_rows, n_classes, n_dims)
-        latent = style_sample.unsqueeze(1)*model.log_sig.exp().unsqueeze(0) + model.mu.unsqueeze(0)
+    # style sample: (n_rows, n_dims)
+    # mu,sig: (n_classes, n_dims)
+    # latent: (n_rows, n_classes, n_dims)
+    latent = style_sample.unsqueeze(1)*model.sig.unsqueeze(0) + model.mu.unsqueeze(0)
     latent.detach_()
     # data: (n_rows, n_classes, 28, 28)
     data = model(latent.view(-1, 784), rev=True).detach().cpu().numpy().reshape(n_rows, 10, 28, 28)
@@ -101,11 +86,11 @@ def emnist_plot_samples(model, n_rows, t, mu=None, sig=None, dims_to_sample=torc
     plt.imshow(im, cmap='gray', vmin=0, vmax=1)
     plt.xticks([])
     plt.yticks([])
-    plt.savefig(os.path.join(save_dir_full, 'samples.png'), bbox_inches='tight', pad_inches=0.5)
+    plt.savefig(os.path.join(model.save_dir, 'figures', 'samples.png'), bbox_inches='tight', pad_inches=0.5)
     plt.close()
 
 
-def emnist_plot_variation_along_dims(model, dims_to_plot, t, mu=None, sig=None, save_dir='./figures/emnist/'):
+def emnist_plot_variation_along_dims(model, dims_to_plot):
     """
     Makes a plot for each of the given latent space dimensions. Each column contains all 10 digits
     with a consistent style. Each row shows the effect of varying the latent space value of the 
@@ -113,30 +98,19 @@ def emnist_plot_variation_along_dims(model, dims_to_plot, t, mu=None, sig=None, 
     values of all other dimensions constant at the mean value. The rightmost column shows a heatmap
     of the absolute pixel difference between the column corresponding to -1 std and +1 std
     """
+    os.makedirs(os.path.join(model.save_dir, 'figures', 'variation_plots'))
     max_std = 2
     n_cols = 9
-    save_dir_full = os.path.join(save_dir, str(t), 'variation_plots')
-    os.makedirs(save_dir_full)
     model.eval()
     for i, dim in enumerate(dims_to_plot):
         fig = plt.figure(figsize=(n_cols+1, 10))
         style = torch.zeros(n_cols, 784)
         style[:, dim] = torch.linspace(-max_std, max_std, n_cols)
         style = style.to(model.device)
-        if model.empirical_vars:
-            assert mu is not None
-            assert sig is not None
-            # style: (n_cols, n_dims)
-            # mu,sig: (n_classes, n_dims)
-            # latent: (n_classes, n_cols, n_dims)
-            latent = style.unsqueeze(0)*sig.unsqueeze(1) + mu.unsqueeze(1)
-        else:
-            assert mu is None
-            assert sig is None
-            # style: (n_cols, n_dims)
-            # mu,sig: (n_classes, n_dims)
-            # latent: (n_classes, n_cols, n_dims)
-            latent = style.unsqueeze(0)*model.log_sig.exp().unsqueeze(1) + model.mu.unsqueeze(1)
+        # style: (n_cols, n_dims)
+        # mu,sig: (n_classes, n_dims)
+        # latent: (n_classes, n_cols, n_dims)
+        latent = style.unsqueeze(0)*model.sig.unsqueeze(1) + model.mu.unsqueeze(1)
         latent.detach_()
         data = model(latent.view(-1, 784), rev=True).detach().cpu().numpy().reshape(10, n_cols, 28, 28)
         im = data.transpose(0, 2, 1, 3).reshape(10*28, n_cols*28)
@@ -148,19 +122,18 @@ def emnist_plot_variation_along_dims(model, dims_to_plot, t, mu=None, sig=None, 
         plt.imshow(im, cmap='gray', vmin=0, vmax=1)
         plt.xticks([])
         plt.yticks([])
-        plt.savefig(os.path.join(save_dir_full, f'variable_{i+1:03d}.png'), bbox_inches='tight', pad_inches=0.5)
+        plt.savefig(os.path.join(model.save_dir, 'figures', 'variation_plots', f'variable_{i+1:03d}.png'), 
+                    bbox_inches='tight', pad_inches=0.5)
         plt.close()
 
 
-def emnist_plot_spectrum(sig_rms, t, save_dir='./figures/emnist/'):
-    save_dir_full = os.path.join(save_dir, str(t))
-    os.makedirs(save_dir_full, exist_ok=True)
+def emnist_plot_spectrum(model, sig_rms):
     fig = plt.figure(figsize=(12, 6))
     plt.semilogy(np.flip(np.sort(sig_rms)), 'k')
     plt.xlabel('Latent dimension (sorted)')
     plt.ylabel('Standard deviation (RMS across classes)')
     plt.title('Spectrum on EMNIST')
-    plt.savefig(os.path.join(save_dir_full, 'spectrum.png'))
+    plt.savefig(os.path.join(model.save_dir, 'figures', 'spectrum.png'))
     plt.close()
     
 
