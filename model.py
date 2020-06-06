@@ -72,6 +72,7 @@ class GIN(nn.Module):
         sched = torch.optim.lr_scheduler.MultiStepLR(optimizer, self.lr_schedule)
         losses = []
         for epoch in range(self.n_epochs):
+            self.epoch = epoch
             for batch_idx, (data, target) in enumerate(self.train_loader):
                 if self.empirical_vars:
                     # first check that std will be well defined
@@ -132,6 +133,7 @@ class GIN(nn.Module):
         if self.dataset == '10d':
             artificial_data_reconstruction_plot(self, self.latent, self.data, self.target)
         elif self.dataset == 'EMNIST':
+            os.makedirs(os.path.join(self.save_dir, 'figures', f'epoch_{self.epoch+1:03d}'))
             self.set_mu_sig()
             sig_rms = np.sqrt(np.mean((self.sig**2).detach().cpu().numpy(), axis=0))
             emnist_plot_samples(self, n_rows=20)

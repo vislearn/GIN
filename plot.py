@@ -86,7 +86,7 @@ def emnist_plot_samples(model, n_rows, dims_to_sample=torch.arange(784), temp=1)
     plt.imshow(im, cmap='gray', vmin=0, vmax=1)
     plt.xticks([])
     plt.yticks([])
-    plt.savefig(os.path.join(model.save_dir, 'figures', 'samples.png'), bbox_inches='tight', pad_inches=0.5)
+    plt.savefig(os.path.join(model.save_dir, 'figures', f'epoch_{model.epoch+1:03d}', 'samples.png'), bbox_inches='tight', pad_inches=0.5)
     plt.close()
 
 
@@ -98,7 +98,7 @@ def emnist_plot_variation_along_dims(model, dims_to_plot):
     values of all other dimensions constant at the mean value. The rightmost column shows a heatmap
     of the absolute pixel difference between the column corresponding to -1 std and +1 std
     """
-    os.makedirs(os.path.join(model.save_dir, 'figures', 'variation_plots'))
+    os.makedirs(os.path.join(model.save_dir, 'figures', f'epoch_{model.epoch+1:03d}', 'variation_plots'))
     max_std = 2
     n_cols = 9
     model.eval()
@@ -122,7 +122,7 @@ def emnist_plot_variation_along_dims(model, dims_to_plot):
         plt.imshow(im, cmap='gray', vmin=0, vmax=1)
         plt.xticks([])
         plt.yticks([])
-        plt.savefig(os.path.join(model.save_dir, 'figures', 'variation_plots', f'variable_{i+1:03d}.png'), 
+        plt.savefig(os.path.join(model.save_dir, 'figures', f'epoch_{model.epoch+1:03d}', 'variation_plots', f'variable_{i+1:03d}.png'), 
                     bbox_inches='tight', pad_inches=0.5)
         plt.close()
 
@@ -133,7 +133,7 @@ def emnist_plot_spectrum(model, sig_rms):
     plt.xlabel('Latent dimension (sorted)')
     plt.ylabel('Standard deviation (RMS across classes)')
     plt.title('Spectrum on EMNIST')
-    plt.savefig(os.path.join(model.save_dir, 'figures', 'spectrum.png'))
+    plt.savefig(os.path.join(model.save_dir, 'figures', f'epoch_{model.epoch+1:03d}', 'spectrum.png'))
     plt.close()
     
 
