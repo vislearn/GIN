@@ -39,6 +39,6 @@ To see the available options:
 python emnist.py -h
 ```
 
-Model checkpoints (.pt files) are saved in `./emnist_save/{timestamp}/model_save` with the specified save frequency. Figures are saved in `./emnist_save/{timestamp}/{epoch}/figures` whenever a checkpoint is made (including at the end of training).
+Model checkpoints (.pt files) are saved in `./emnist_save/{timestamp}/model_save` with the specified save frequency. Figures are saved in `./emnist_save/{timestamp}/figures` whenever a checkpoint is made (including at the end of training).
 
 For further details please refer to the <a href=https://arxiv.org/abs/2001.04872>paper</a>.
