@@ -168,8 +168,8 @@ class GIN(nn.Module):
             latent = torch.cat(latent, 0)
             target = torch.cat(target, 0)
         if self.empirical_vars:
-            self.mu = torch.stack([latent[target == i].mean(0) for i in range(10)])
-            self.sig = torch.stack([latent[target == i].std(0) for i in range(10)])
+            self.mu = torch.stack([latent[target == i].mean(0) for i in range(10)]).to(self.device)
+            self.sig = torch.stack([latent[target == i].std(0) for i in range(10)]).to(self.device)
         else:
             if init:
                 self.mu.data = torch.stack([latent[target == i].mean(0) for i in range(10)])
