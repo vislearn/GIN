@@ -153,7 +153,7 @@ class GIN(nn.Module):
         else:
             raise RuntimeError("Check dataset name. Doesn't match.")
     
-    def set_mu_sig(self, init=False, n_batches=10):
+    def set_mu_sig(self, init=False, n_batches=40):
         if self.empirical_vars or init:
             examples = iter(self.test_loader)
             n_batches = min(n_batches, len(examples))
