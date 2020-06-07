@@ -21,7 +21,7 @@ Tests were made with both CPU (artificial data only) and GPU (artificial data an
 ## Usage
 Clone the repository:
 ```shell
-git clone [TODO]
+git clone https://github.com/VLL-HD/GIN.git
 cd GIN
 ```
 
