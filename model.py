@@ -53,6 +53,9 @@ class GIN(nn.Module):
         if not empirical_vars:
             self.mu = nn.Parameter(torch.zeros(self.n_classes, self.n_dims).to(self.device)).requires_grad_()
             self.log_sig = nn.Parameter(torch.zeros(self.n_classes, self.n_dims).to(self.device)).requires_grad_()
+            # initialize these parameters to reasonable values
+            self.set_mu_sig(init=True)
+            
         
         self.to(self.device)
             
@@ -150,16 +153,29 @@ class GIN(nn.Module):
         else:
             raise RuntimeError("Check dataset name. Doesn't match.")
     
-    def set_mu_sig(self):
-        if self.empirical_vars:
+    def set_mu_sig(self, init=False, n_batches=10):
+        if self.empirical_vars or init:
             examples = iter(self.test_loader)
-            data, target = next(examples)
-            self.eval()
-            latent = self(data.to(self.device)).detach().cpu()
+            n_batches = min(n_batches, len(examples))
+            latent = []
+            target = []
+            for _ in range(n_batches):
+                data, targ = next(examples)
+                data += torch.randn_like(data)*1e-2
+                self.eval()
+                latent.append(self(data.to(self.device)).detach().cpu())
+                target.append(targ)
+            latent = torch.cat(latent, 0)
+            target = torch.cat(target, 0)
+        if self.empirical_vars:
             self.mu = torch.stack([latent[target == i].mean(0) for i in range(10)])
             self.sig = torch.stack([latent[target == i].std(0) for i in range(10)])
         else:
-            self.sig = self.log_sig.exp().detach()
+            if init:
+                self.mu.data = torch.stack([latent[target == i].mean(0) for i in range(10)])
+                self.log_sig.data = torch.stack([latent[target == i].std(0) for i in range(10)]).log()
+            else:
+                self.sig = self.log_sig.exp().detach()
 
 
 
