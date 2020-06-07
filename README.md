@@ -14,6 +14,7 @@ The scripts in this repository were tested with the following package versions (
 - **matplotlib** 3.1.3
 - **pytorch** 1.5.0
 - **torchvision** 0.6.0
+- **cudatoolkit** 10.2.89
 
 Tests were made with both CPU (artificial data only) and GPU (artificial data and EMNIST).
 
