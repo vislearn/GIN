@@ -33,6 +33,10 @@ python artificial_data.py -h
 
 Reconstructions are saved in `./artificial_data_save/{timestamp}/figures`. Eight reconstructions are plotted, each corresponding to a different orientation of the reconstructed latent space.
 
+Example reconstruction plot:
+
+![artificial_data_reconstruction_plot](sample_plots/reconstruction_3.png)
+
 
 ### EMNIST
 To see the available options:
@@ -41,5 +45,10 @@ python emnist.py -h
 ```
 
 Model checkpoints (.pt files) are saved in `./emnist_save/{timestamp}/model_save` with the specified save frequency. Figures are saved in `./emnist_save/{timestamp}/figures` whenever a checkpoint is made (including at the end of training).
+
+Example plots:
+
+![emnist_spectrum](sample_plots/spectrum.png)
+![emnist_first_dim](sample_plots/variable_001.png)
 
 For further details please refer to the <a href=https://arxiv.org/abs/2001.04872>paper</a>.
