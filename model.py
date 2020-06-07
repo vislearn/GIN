@@ -22,9 +22,9 @@ class GIN(nn.Module):
         self.lr_schedule = lr_schedule
         self.batch_size = batch_size
         self.save_frequency = min(save_frequency, n_epochs)
-        self.incompressible_flow = incompressible_flow
-        self.empirical_vars = empirical_vars
-        self.init_identity = init_identity
+        self.incompressible_flow = bool(incompressible_flow)
+        self.empirical_vars = bool(empirical_vars)
+        self.init_identity = bool(init_identity)
         
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.timestamp = str(int(time()))
@@ -61,16 +61,21 @@ class GIN(nn.Module):
         return x
     
     def train_model(self):
+        os.makedirs(self.save_dir)
+        with open(os.path.join(self.save_dir, 'log.txt'), 'w') as f:
+            f.write(f'incompressible_flow {self.incompressible_flow}\n')
+            f.write(f'empirical_vars {self.empirical_vars}\n')
+            f.write(f'init_identity {self.init_identity}\n')
+        os.makedirs(os.path.join(self.save_dir, 'model_save'))
+        os.makedirs(os.path.join(self.save_dir, 'figures'))
         print(f'\nTraining model for {self.n_epochs} epochs \n')
         self.train()
         self.to(self.device)
-        t0 = time()
-        os.makedirs(os.path.join(self.save_dir, 'model_save'))
-        os.makedirs(os.path.join(self.save_dir, 'figures'))
         print('  time     epoch    iteration         loss       last checkpoint')
         optimizer = torch.optim.Adam(self.parameters(), self.lr)
         sched = torch.optim.lr_scheduler.MultiStepLR(optimizer, self.lr_schedule)
         losses = []
+        t0 = time()
         for epoch in range(self.n_epochs):
             self.epoch = epoch
             for batch_idx, (data, target) in enumerate(self.train_loader):
