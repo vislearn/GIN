@@ -8,6 +8,7 @@ Make sure you have numpy and pytorch installed (recommended versions below). The
 pip install git+https://github.com/VLL-HD/FrEIA.git
 ```
 
+### Recommended package versions
 The scripts in this repository were tested with the following package versions (may also work with earlier versions, eg python 3.7):
 - **python** 3.8.3
 - **numpy** 1.18.1
