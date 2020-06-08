@@ -2,7 +2,7 @@
 Code for the paper <a href=https://arxiv.org/abs/2001.04872>"Disentanglement by Nonlinear ICA with General Incompressible-flow Networks (GIN)" (2020)</a>
 
 ## Prerequisites 
-First install <a href=https://github.com/VLL-HD/FrEIA>FrEIA</a>:
+Make sure you have numpy and pytorch installed (recommended versions below). Then install <a href=https://github.com/VLL-HD/FrEIA>FrEIA</a>:
 
 ```shell
 pip install git+https://github.com/VLL-HD/FrEIA.git
