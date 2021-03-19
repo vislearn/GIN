@@ -5,7 +5,7 @@ Code for the paper <a href=https://arxiv.org/abs/2001.04872>"Disentanglement by 
 Make sure you have numpy and pytorch installed (recommended versions below). Then install <a href=https://github.com/VLL-HD/FrEIA>FrEIA</a>:
 
 ```shell
-pip install git+https://github.com/VLL-HD/FrEIA.git
+pip install git+https://github.com/VLL-HD/FrEIA.git@06a61b77aa2ee80a362abcc334f3801043f428d0
 ```
 
 ### Recommended package versions
