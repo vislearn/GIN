@@ -81,7 +81,7 @@ def emnist_plot_samples(model, n_rows, dims_to_sample=torch.arange(784), temp=1)
     latent = style_sample.unsqueeze(1)*model.sig.unsqueeze(0) + model.mu.unsqueeze(0)
     latent.detach_()
     # data: (n_rows, n_classes, 28, 28)
-    data = model(latent.view(-1, 784), rev=True).detach().cpu().numpy().reshape(n_rows, 10, 28, 28)
+    data = (model(latent.view(-1, 784), rev=True)[0]).detach().cpu().numpy().reshape(n_rows, 10, 28, 28)
     im = data.transpose(0, 2, 1, 3).reshape(n_rows*28, 10*28)
     plt.imshow(im, cmap='gray', vmin=0, vmax=1)
     plt.xticks([])
@@ -112,7 +112,7 @@ def emnist_plot_variation_along_dims(model, dims_to_plot):
         # latent: (n_classes, n_cols, n_dims)
         latent = style.unsqueeze(0)*model.sig.unsqueeze(1) + model.mu.unsqueeze(1)
         latent.detach_()
-        data = model(latent.view(-1, 784), rev=True).detach().cpu().numpy().reshape(10, n_cols, 28, 28)
+        data = (model(latent.view(-1, 784), rev=True)[0]).detach().cpu().numpy().reshape(10, n_cols, 28, 28)
         im = data.transpose(0, 2, 1, 3).reshape(10*28, n_cols*28)
         # images at +1 and -1 std
         im_p1 = im[:, 28*2:28*3]
