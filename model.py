@@ -91,8 +91,7 @@ class GIN(nn.Module):
                 optimizer.zero_grad()
                 data += torch.randn_like(data)*1e-2
                 data = data.to(self.device)
-                z = self.net(data)          # latent space variable
-                logdet_J = self.net.log_jacobian(run_forward=False)
+                z, logdet_J = self.net(data)          # latent space variable
                 if self.empirical_vars:
                     # we only need to calculate the std
                     sig = torch.stack([z[target==i].std(0, unbiased=False) for i in range(self.n_classes)])
