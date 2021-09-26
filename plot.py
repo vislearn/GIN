@@ -12,7 +12,7 @@ def artificial_data_reconstruction_plot(model, latent, data, target):
     """
     model.eval()
     model.cpu()
-    z_reconstructed = model(data).detach()
+    z_reconstructed = (model(data)[0]).detach()
     sig = torch.stack([z_reconstructed[target==i].std(0, unbiased=False) for i in range(model.n_classes)])
     rms_sig = np.sqrt(np.mean(sig.numpy()**2, 0))
     latent_sig = torch.stack([latent[target==i].std(0, unbiased=False) for i in range(model.n_classes)])
