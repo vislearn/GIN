@@ -300,6 +300,6 @@ def generate_artificial_data_10d(n_clusters, n_data_points):
     latent = torch.cat([latent, torch.randn(n_data_points, 8)*1e-2], 1)
     
     random_transf = construct_net_10d('glow', init_identity=False)
-    data = random_transf(latent).detach()
+    data = random_transf(latent)[0].detach()
     
     return latent, data, labels
