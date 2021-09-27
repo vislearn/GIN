@@ -60,8 +60,8 @@ class GIN(nn.Module):
         self.to(self.device)
             
     def forward(self, x, rev=False):
-        x = self.net(x, rev=rev)
-        return x
+        x, logdet_J  = self.net(x, rev=rev)
+        return x, logdet_J 
     
     def train_model(self):
         os.makedirs(self.save_dir)
@@ -91,8 +91,7 @@ class GIN(nn.Module):
                 optimizer.zero_grad()
                 data += torch.randn_like(data)*1e-2
                 data = data.to(self.device)
-                z = self.net(data)          # latent space variable
-                logdet_J = self.net.log_jacobian(run_forward=False)
+                z, logdet_J = self.net(data)          # latent space variable
                 if self.empirical_vars:
                     # we only need to calculate the std
                     sig = torch.stack([z[target==i].std(0, unbiased=False) for i in range(self.n_classes)])
@@ -163,7 +162,7 @@ class GIN(nn.Module):
                 data, targ = next(examples)
                 data += torch.randn_like(data)*1e-2
                 self.eval()
-                latent.append(self(data.to(self.device)).detach().cpu())
+                latent.append((self(data.to(self.device))[0]).detach().cpu())
                 target.append(targ)
             latent = torch.cat(latent, 0)
             target = torch.cat(target, 0)
@@ -301,6 +300,6 @@ def generate_artificial_data_10d(n_clusters, n_data_points):
     latent = torch.cat([latent, torch.randn(n_data_points, 8)*1e-2], 1)
     
     random_transf = construct_net_10d('glow', init_identity=False)
-    data = random_transf(latent).detach()
+    data = random_transf(latent)[0].detach()
     
     return latent, data, labels
